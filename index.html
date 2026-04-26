@@ -746,8 +746,10 @@ function saveSettings() {
   const enSelect = document.getElementById('en-voice-select');
   const deManual = document.getElementById('de-voice-manual').value.trim();
   const enManual = document.getElementById('en-voice-manual').value.trim();
-  const deName = deManual || deSelect.value;
-  const enName = enManual || enSelect.value;
+  const deName = deManual || deSelect.value || '';
+  const enName = enManual || enSelect.value || '';
+  document.getElementById('de-voice-manual').value = deName;
+  document.getElementById('en-voice-manual').value = enName;
   state.deVoice = state.allVoices.find(v => v.name === deName) || null;
   state.enVoice = state.allVoices.find(v => v.name === enName) || null;
   localStorage.setItem('deVoiceName', deName);
@@ -820,6 +822,11 @@ function setupRecognition() {
   state.recognition.continuous = false;
   state.recognition.interimResults = false;
   state.recognition.lang = 'de-DE';
+  state.recognition.maxAlternatives = 1;
+ 
+  state.recognition.onspeechend = () => {
+    setTimeout(() => { try { state.recognition.stop(); } catch(e) {} }, 1200);
+  };
  
   state.recognition.onresult = (e) => {
     const transcript = e.results[0][0].transcript;
@@ -838,7 +845,16 @@ function setupRecognition() {
   };
 }
  
+function unlockIOSAudio() {
+  if (window._iosAudioUnlocked) return;
+  const u = new SpeechSynthesisUtterance('');
+  u.volume = 0;
+  speechSynthesis.speak(u);
+  window._iosAudioUnlocked = true;
+}
+ 
 function toggleMic() {
+  unlockIOSAudio();
   if (!state.apiKey) { showToast('Add your API key in Settings first'); openSettings(); return; }
   if (state.isSpeaking) { speechSynthesis.cancel(); setWave(false); state.isSpeaking = false; }
   if (state.isListening) { stopListening(); return; }
@@ -909,8 +925,7 @@ function addBubble(role, text) {
 }
  
 function parseResponse(text) {
-  return text.replace(/\[DE\](.*?)\[EN\]/gs, '<span class="de-text">$1</span>')
-             .replace(/\[DE\](.*?)$/gs, '<span class="de-text">$1</span>');
+  return text.replace(/\[DE\](.*?)\[\/DE\]/gs, '<span class="de-text">$1</span>');
 }
  
 function setListening(on) {
@@ -928,11 +943,15 @@ const SYSTEM_PROMPT = `You are a friendly German language tutor. The user may sp
  
 Rules:
 - If the user speaks German, assess their grammar silently. Only correct if they explicitly ask "is that correct?" or similar.
-- If asked to check grammar, respond concisely: say if it's correct or not, and briefly explain why.
+- If asked to check grammar, respond concisely: correct or not, and briefly why.
 - If the user asks how to say something in German, provide the German phrase and a short explanation.
-- If the user speaks a mix of German and English, understand the intent and help them say it fully in German.
-- Keep all responses short and voice-friendly — 1 to 3 sentences maximum.
-- When including a German phrase in your response, wrap it like this: [DE]Kann ich hier sitzen?[EN] followed by the English explanation.
+- If the user speaks a mix of German and English, help them say it fully in German.
+- Keep responses short and voice-friendly — 1 to 3 sentences maximum.
+- CRITICAL: Always separate German and English into distinct tagged segments. Never mix them in the same sentence.
+- Format EVERY German phrase like this: [DE]Kann ich hier sitzen?[/DE] 
+- Then write the English explanation as plain text outside the tags.
+- Example response: [DE]Kann ich hier sitzen?[/DE] This means: Can I sit here? The verb sitzen means to sit.
+- Never put German words inside English sentences without tagging them.
 - Be warm, encouraging and patient.`;
  
 async function sendToTutor(userText) {
@@ -986,10 +1005,10 @@ function speak(text) {
  
 function parseSegments(text) {
   const segs = [];
-  const regex = /\[DE\](.*?)\[EN\]|([^\[]+)/gs;
+  const regex = /\[DE\](.*?)\[\/DE\]|([^\[]+)/gs;
   let match;
   while ((match = regex.exec(text)) !== null) {
-    if (match[1]) segs.push({ text: match[1].trim(), lang: 'de' });
+    if (match[1] && match[1].trim()) segs.push({ text: match[1].trim(), lang: 'de' });
     else if (match[2] && match[2].trim()) segs.push({ text: match[2].trim(), lang: 'en' });
   }
   if (!segs.length) segs.push({ text, lang: 'en' });

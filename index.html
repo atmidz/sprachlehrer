@@ -625,27 +625,25 @@
     </div>
  
     <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div class="settings-section-label" style="margin-bottom:0;">VOICES</div>
-        <button onclick="refreshVoices()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;">↻ refresh list</button>
+      <div class="settings-section-label">GOOGLE TTS KEY</div>
+      <div class="settings-row">
+        <div class="settings-row-label">Google Cloud API key</div>
+        <input type="password" id="google-tts-key-input" placeholder="AIzaSy..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:-4px;">Get a free key at console.cloud.google.com → APIs & Services → Credentials. Enable Cloud Text-to-Speech API.</div>
+    </div>
+ 
+    <div>
+      <div class="settings-section-label">VOICE OVERRIDE (optional)</div>
+      <div class="settings-row">
+        <div class="settings-row-label">German voice name</div>
+        <input type="text" id="de-voice-manual" placeholder="default: de-DE-Wavenet-F" autocomplete="off" spellcheck="false"/>
       </div>
       <div class="settings-row">
-        <div class="settings-row-label">German voice</div>
-        <select id="de-voice-select"></select>
-        <div style="margin-top:8px;border-top:0.5px solid var(--border);padding-top:8px;">
-          <div class="settings-row-label" style="margin-bottom:4px;">or type name manually</div>
-          <input type="text" id="de-voice-manual" placeholder="e.g. Petra" autocomplete="off" spellcheck="false"/>
-        </div>
+        <div class="settings-row-label">English voice name</div>
+        <input type="text" id="en-voice-manual" placeholder="default: en-US-Wavenet-F" autocomplete="off" spellcheck="false"/>
       </div>
-      <div class="settings-row">
-        <div class="settings-row-label">English voice</div>
-        <select id="en-voice-select"></select>
-        <div style="margin-top:8px;border-top:0.5px solid var(--border);padding-top:8px;">
-          <div class="settings-row-label" style="margin-bottom:4px;">or type name manually</div>
-          <input type="text" id="en-voice-manual" placeholder="e.g. Daniel" autocomplete="off" spellcheck="false"/>
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:-4px;margin-bottom:4px;line-height:1.5;">On iPhone, go to Settings → Accessibility → Spoken Content → Voices to see exact voice names.</div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:-4px;">Leave blank to use defaults. Full list at cloud.google.com/text-to-speech/docs/voices</div>
     </div>
  
     <div>
@@ -673,6 +671,7 @@
 // ─── STATE ───────────────────────────────────────────────────────────────────
 const state = {
   apiKey: '',
+  googleTtsKey: '',
   deVoice: null,
   enVoice: null,
   autocopy: false,
@@ -681,7 +680,8 @@ const state = {
   isListening: false,
   isSpeaking: false,
   recognition: null,
-  allVoices: []
+  allVoices: [],
+  audioContext: null
 };
  
 // ─── WORD OF THE DAY ─────────────────────────────────────────────────────────
@@ -715,8 +715,10 @@ function showScreen(id) {
 }
  
 function openSettings() {
-  populateVoiceSelects();
   document.getElementById('api-key-input').value = state.apiKey ? '••••••••' + state.apiKey.slice(-4) : '';
+  document.getElementById('google-tts-key-input').value = state.googleTtsKey ? '••••••••' + state.googleTtsKey.slice(-4) : '';
+  document.getElementById('de-voice-manual').value = localStorage.getItem('deVoiceName') || '';
+  document.getElementById('en-voice-manual').value = localStorage.getItem('enVoiceName') || '';
   showScreen('settings-screen');
 }
  
@@ -727,6 +729,7 @@ function closeSettings() {
 // ─── SETTINGS ────────────────────────────────────────────────────────────────
 function loadSettings() {
   state.apiKey = localStorage.getItem('apiKey') || '';
+  state.googleTtsKey = localStorage.getItem('googleTtsKey') || '';
   state.autocopy = localStorage.getItem('autocopy') === 'true';
   const savedDe = localStorage.getItem('deVoiceName');
   const savedEn = localStorage.getItem('enVoiceName');
@@ -742,20 +745,18 @@ function saveSettings() {
     localStorage.setItem('apiKey', keyInput);
   }
  
-  const deSelect = document.getElementById('de-voice-select');
-  const enSelect = document.getElementById('en-voice-select');
+  const gKeyInput = document.getElementById('google-tts-key-input').value.trim();
+  if (gKeyInput && !gKeyInput.startsWith('••')) {
+    state.googleTtsKey = gKeyInput;
+    localStorage.setItem('googleTtsKey', gKeyInput);
+  }
+ 
   const deManual = document.getElementById('de-voice-manual').value.trim();
   const enManual = document.getElementById('en-voice-manual').value.trim();
-  const deName = deManual || deSelect.value || '';
-  const enName = enManual || enSelect.value || '';
-  document.getElementById('de-voice-manual').value = deName;
-  document.getElementById('en-voice-manual').value = enName;
-  state.deVoice = state.allVoices.find(v => v.name === deName) || null;
-  state.enVoice = state.allVoices.find(v => v.name === enName) || null;
-  localStorage.setItem('deVoiceName', deName);
-  localStorage.setItem('enVoiceName', enName);
-  localStorage.setItem('autocopy', state.autocopy);
+  if (deManual) localStorage.setItem('deVoiceName', deManual);
+  if (enManual) localStorage.setItem('enVoiceName', enManual);
  
+  localStorage.setItem('autocopy', state.autocopy);
   document.getElementById('no-key-banner').classList.toggle('visible', !state.apiKey);
   showToast('Settings saved');
   setTimeout(() => closeSettings(), 800);
@@ -847,9 +848,7 @@ function setupRecognition() {
  
 function unlockIOSAudio() {
   if (window._iosAudioUnlocked) return;
-  const u = new SpeechSynthesisUtterance('');
-  u.volume = 0;
-  speechSynthesis.speak(u);
+  try { getAudioContext(); } catch(e) {}
   window._iosAudioUnlocked = true;
 }
  
@@ -996,50 +995,89 @@ async function sendToTutor(userText) {
   }
 }
  
-// ─── TTS ─────────────────────────────────────────────────────────────────────
-function speak(text) {
+// ─── GOOGLE TTS ──────────────────────────────────────────────────────────────
+const GOOGLE_TTS_URL = 'https://texttospeech.googleapis.com/v1/text:synthesize';
+ 
+// German WaveNet voice — natural, high quality
+const DE_VOICE = { languageCode: 'de-DE', name: 'de-DE-Wavenet-F', ssmlGender: 'FEMALE' };
+const EN_VOICE = { languageCode: 'en-US', name: 'en-US-Wavenet-F', ssmlGender: 'FEMALE' };
+ 
+function getAudioContext() {
+  if (!state.audioContext) state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  if (state.audioContext.state === 'suspended') state.audioContext.resume();
+  return state.audioContext;
+}
+ 
+async function googleSpeak(text, lang) {
+  const key = state.googleTtsKey;
+  if (!key) { await fallbackSpeak(text, lang); return; }
+ 
+  const isDE = lang === 'de';
+  const savedName = localStorage.getItem(isDE ? 'deVoiceName' : 'enVoiceName');
+  const defaultVoice = isDE ? DE_VOICE : EN_VOICE;
+  const voice = savedName
+    ? { languageCode: isDE ? 'de-DE' : 'en-US', name: savedName, ssmlGender: 'FEMALE' }
+    : defaultVoice;
+ 
+  const body = {
+    input: { text },
+    voice,
+    audioConfig: { audioEncoding: 'MP3', speakingRate: isDE ? 0.9 : 1.0 }
+  };
+ 
+  try {
+    const res = await fetch(`${GOOGLE_TTS_URL}?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('Google TTS error');
+    const data = await res.json();
+    const audio = base64ToArrayBuffer(data.audioContent);
+    const ctx = getAudioContext();
+    const decoded = await ctx.decodeAudioData(audio);
+    const source = ctx.createBufferSource();
+    source.buffer = decoded;
+    source.connect(ctx.destination);
+    return new Promise(resolve => {
+      source.onended = resolve;
+      source.start(0);
+    });
+  } catch (e) {
+    fallbackSpeak(text, lang);
+  }
+}
+ 
+function base64ToArrayBuffer(base64) {
+  const bin = atob(base64);
+  const buf = new ArrayBuffer(bin.length);
+  const view = new Uint8Array(buf);
+  for (let i = 0; i < bin.length; i++) view[i] = bin.charCodeAt(i);
+  return buf;
+}
+ 
+function fallbackSpeak(text, lang) {
+  return new Promise(resolve => {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = lang === 'de' ? 'de-DE' : 'en-US';
+    utter.rate = lang === 'de' ? 0.88 : 0.95;
+    utter.onend = resolve;
+    utter.onerror = resolve;
+    speechSynthesis.speak(utter);
+  });
+}
+ 
+async function speak(text) {
   speechSynthesis.cancel();
   const segments = parseSegments(text);
-  speakSegments(segments, 0);
-}
- 
-function parseSegments(text) {
-  const segs = [];
-  const regex = /\[DE\](.*?)\[\/DE\]|([^\[]+)/gs;
-  let match;
-  while ((match = regex.exec(text)) !== null) {
-    if (match[1] && match[1].trim()) segs.push({ text: match[1].trim(), lang: 'de' });
-    else if (match[2] && match[2].trim()) segs.push({ text: match[2].trim(), lang: 'en' });
-  }
-  if (!segs.length) segs.push({ text, lang: 'en' });
-  return segs;
-}
- 
-function speakSegments(segs, idx) {
-  if (idx >= segs.length) { setWave(false); state.isSpeaking = false; return; }
-  const seg = segs[idx];
-  const utter = new SpeechSynthesisUtterance(seg.text);
-  const liveVoices = window.speechSynthesis.getVoices();
- 
-  if (seg.lang === 'de') {
-    utter.lang = 'de-DE';
-    const deName = localStorage.getItem('deVoiceName');
-    const v = liveVoices.find(v => v.name === deName) || state.deVoice;
-    if (v) utter.voice = v;
-    utter.rate = 0.88;
-  } else {
-    utter.lang = 'en-US';
-    const enName = localStorage.getItem('enVoiceName');
-    const v = liveVoices.find(v => v.name === enName) || state.enVoice;
-    if (v) utter.voice = v;
-    utter.rate = 0.95;
-  }
- 
   setWave(true);
   state.isSpeaking = true;
-  utter.onend = () => speakSegments(segs, idx + 1);
-  utter.onerror = () => speakSegments(segs, idx + 1);
-  speechSynthesis.speak(utter);
+  for (const seg of segments) {
+    if (!state.isSpeaking) break;
+    await googleSpeak(seg.text, seg.lang);
+  }
+  setWave(false);
+  state.isSpeaking = false;
 }
  
 // ─── RESET & DOWNLOAD ────────────────────────────────────────────────────────

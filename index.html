@@ -12,7 +12,7 @@
 <title>Sprachlehrer</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+ 
   :root {
     --bg: #0f1117;
     --bg2: #161616;
@@ -28,7 +28,7 @@
     --flag-amber: #b07800;
     --flag-black: #1a1a1a;
   }
-
+ 
   html, body {
     height: 100%;
     background: var(--bg);
@@ -36,7 +36,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     overflow: hidden;
   }
-
+ 
   .screen {
     position: absolute;
     inset: 0;
@@ -44,13 +44,13 @@
     flex-direction: column;
     transition: opacity 0.25s, transform 0.25s;
   }
-
+ 
   .screen.hidden {
     opacity: 0;
     pointer-events: none;
     transform: translateY(16px);
   }
-
+ 
   /* APP BAR */
   .appbar {
     display: flex;
@@ -60,11 +60,11 @@
     border-bottom: 0.5px solid var(--border);
     flex-shrink: 0;
   }
-
+ 
   .appbar.with-back {
     justify-content: space-between;
   }
-
+ 
   .icon-btn {
     width: 36px;
     height: 36px;
@@ -78,10 +78,10 @@
     color: var(--text2);
     transition: color 0.15s, background 0.15s;
   }
-
+ 
   .icon-btn:active { background: var(--bg3); }
   .icon-btn svg { width: 18px; height: 18px; }
-
+ 
   /* HOME — WORD OF DAY */
   #home-content {
     flex: 1;
@@ -92,14 +92,14 @@
     padding: 32px 24px;
     text-align: center;
   }
-
+ 
   .wotd-label {
     font-size: 10px;
     letter-spacing: 0.14em;
     color: var(--text3);
     margin-bottom: 20px;
   }
-
+ 
   .wotd-word {
     font-size: 42px;
     font-weight: 300;
@@ -107,14 +107,14 @@
     margin-bottom: 6px;
     letter-spacing: -0.01em;
   }
-
+ 
   .wotd-pos {
     font-size: 13px;
     color: var(--text3);
     font-style: italic;
     margin-bottom: 20px;
   }
-
+ 
   .wotd-meaning {
     font-size: 14px;
     color: var(--text2);
@@ -122,14 +122,14 @@
     max-width: 220px;
     margin-bottom: 28px;
   }
-
+ 
   .wotd-divider {
     width: 32px;
     height: 0.5px;
     background: var(--border2);
     margin-bottom: 28px;
   }
-
+ 
   .wotd-example {
     font-size: 13px;
     color: var(--text3);
@@ -137,7 +137,7 @@
     line-height: 1.6;
     max-width: 240px;
   }
-
+ 
   /* CHAT */
   #chat-messages {
     flex: 1;
@@ -148,7 +148,7 @@
     gap: 10px;
     -webkit-overflow-scrolling: touch;
   }
-
+ 
   .bubble {
     max-width: 82%;
     padding: 10px 14px;
@@ -156,14 +156,14 @@
     font-size: 14px;
     line-height: 1.55;
   }
-
+ 
   .bubble.user {
     align-self: flex-end;
     background: var(--bg3);
     border-radius: 16px 16px 4px 16px;
     color: #c8c8c8;
   }
-
+ 
   .bubble.tutor {
     align-self: flex-start;
     background: var(--bg2);
@@ -171,23 +171,23 @@
     border-radius: 16px 16px 16px 4px;
     color: #b8b8b8;
   }
-
+ 
   .bubble.tutor .de-text {
     color: var(--text);
     font-weight: 500;
     display: block;
     margin-bottom: 4px;
   }
-
+ 
   .bubble-label {
     font-size: 10px;
     color: var(--text3);
     margin-top: 4px;
   }
-
+ 
   .bubble-label.user { text-align: right; align-self: flex-end; }
   .bubble-label.tutor { align-self: flex-start; }
-
+ 
   /* WAVE ANIMATION */
   #wave-container {
     display: none;
@@ -197,16 +197,16 @@
     gap: 5px;
     padding: 4px 0;
   }
-
+ 
   #wave-container.visible { display: flex; }
-
+ 
   .wave-bars {
     display: flex;
     gap: 3px;
     align-items: center;
     height: 20px;
   }
-
+ 
   .wbar {
     width: 2.5px;
     border-radius: 2px;
@@ -214,7 +214,7 @@
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
   }
-
+ 
   @keyframes wb1{0%,100%{height:3px}50%{height:16px}}
   @keyframes wb2{0%,100%{height:7px}50%{height:4px}}
   @keyframes wb3{0%,100%{height:12px}50%{height:5px}}
@@ -227,7 +227,7 @@
   @keyframes wb10{0%,100%{height:6px}50%{height:16px}}
   @keyframes wb11{0%,100%{height:15px}50%{height:4px}}
   @keyframes wb12{0%,100%{height:4px}50%{height:11px}}
-
+ 
   .wbar:nth-child(1){animation-name:wb1;animation-delay:0s;background:#6B0000}
   .wbar:nth-child(2){animation-name:wb2;animation-delay:0.07s;background:#7a0d00}
   .wbar:nth-child(3){animation-name:wb3;animation-delay:0.14s;background:#944a00}
@@ -240,12 +240,12 @@
   .wbar:nth-child(10){animation-name:wb10;animation-delay:0.63s;background:#944a00}
   .wbar:nth-child(11){animation-name:wb11;animation-delay:0.70s;background:#7a0d00}
   .wbar:nth-child(12){animation-name:wb12;animation-delay:0.77s;background:#6B0000}
-
+ 
   .wave-label {
     font-size: 10px;
     color: var(--text3);
   }
-
+ 
   /* LISTENING INDICATOR */
   #listening-indicator {
     display: none;
@@ -254,11 +254,11 @@
     gap: 6px;
     padding: 4px 0;
   }
-
+ 
   #listening-indicator.visible {
     display: flex;
   }
-
+ 
   .listen-dot {
     width: 5px;
     height: 5px;
@@ -267,12 +267,12 @@
     opacity: 0.6;
     animation: pulse 1.4s ease-in-out infinite;
   }
-
+ 
   .listen-dot:nth-child(2) { animation-delay: 0.2s; background: var(--flag-amber); }
   .listen-dot:nth-child(3) { animation-delay: 0.4s; background: #333; }
-
+ 
   @keyframes pulse { 0%,100%{transform:scale(1);opacity:0.4} 50%{transform:scale(1.4);opacity:0.9} }
-
+ 
   /* BOTTOM BAR */
   .bottom-bar {
     padding: 12px 20px 36px;
@@ -283,7 +283,7 @@
     border-top: 0.5px solid var(--border);
     flex-shrink: 0;
   }
-
+ 
   .side-btn {
     width: 40px;
     height: 40px;
@@ -297,11 +297,11 @@
     color: var(--text2);
     transition: opacity 0.2s, color 0.15s, border-color 0.15s;
   }
-
+ 
   .side-btn:active { background: var(--bg3); }
   .side-btn.disabled { opacity: 0.25; pointer-events: none; }
   .side-btn svg { width: 16px; height: 16px; }
-
+ 
   /* MIC BUTTON */
   .mic-wrap {
     position: relative;
@@ -311,32 +311,32 @@
     align-items: center;
     justify-content: center;
   }
-
+ 
   .mic-ring {
     position: absolute;
     border-radius: 50%;
     border: 0.5px solid transparent;
     transition: opacity 0.3s;
   }
-
+ 
   .mic-ring-1 {
     inset: -5px;
     border-color: #4a0d0d;
     box-shadow: 0 0 6px 0px #4a0d0d40;
   }
-
+ 
   .mic-ring-2 {
     inset: -10px;
     border-color: #3a2200;
     box-shadow: 0 0 8px 0px #3a220030;
   }
-
+ 
   .mic-ring-3 {
     inset: -15px;
     border-color: #1a1a00;
     box-shadow: 0 0 10px 0px #1a1a0020;
   }
-
+ 
   .mic-btn {
     width: 64px;
     height: 64px;
@@ -352,34 +352,34 @@
     box-shadow: 0 0 0 1.5px #4a0d0d, 0 0 0 3px #3a2200, 0 0 0 4.5px #1a1a00;
     transition: box-shadow 0.2s, transform 0.1s;
   }
-
+ 
   .mic-btn:active { transform: scale(0.95); }
-
+ 
   .mic-btn.listening {
     box-shadow: 0 0 0 1.5px #8B0000, 0 0 0 3px #b07800, 0 0 0 5px #222, 0 0 16px 2px #8B000040;
   }
-
+ 
   .mic-btn svg { width: 24px; height: 24px; color: #d0d0d0; }
-
+ 
   /* SETTINGS */
   #settings-screen {
     overflow-y: auto;
   }
-
+ 
   .settings-body {
     padding: 24px 20px;
     display: flex;
     flex-direction: column;
     gap: 28px;
   }
-
+ 
   .settings-section-label {
     font-size: 10px;
     letter-spacing: 0.12em;
     color: var(--text3);
     margin-bottom: 10px;
   }
-
+ 
   .settings-row {
     background: var(--bg2);
     border-radius: 12px;
@@ -390,12 +390,12 @@
     gap: 6px;
     margin-bottom: 8px;
   }
-
+ 
   .settings-row-label {
     font-size: 11px;
     color: var(--text3);
   }
-
+ 
   .settings-row select, .settings-row input {
     background: transparent;
     border: none;
@@ -406,12 +406,12 @@
     -webkit-appearance: none;
     font-family: inherit;
   }
-
+ 
   .settings-row select option {
     background: #1e1e1e;
     color: var(--text);
   }
-
+ 
   .settings-toggle-row {
     background: var(--bg2);
     border-radius: 12px;
@@ -422,10 +422,10 @@
     justify-content: space-between;
     margin-bottom: 8px;
   }
-
+ 
   .toggle-label { font-size: 14px; color: var(--text); }
   .toggle-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-
+ 
   .toggle {
     width: 44px;
     height: 24px;
@@ -437,9 +437,9 @@
     transition: background 0.2s;
     flex-shrink: 0;
   }
-
+ 
   .toggle.on { background: #4a0d0d; border-color: #6B0000; }
-
+ 
   .toggle-thumb {
     width: 18px;
     height: 18px;
@@ -450,9 +450,9 @@
     left: 3px;
     transition: left 0.2s, background 0.2s;
   }
-
+ 
   .toggle.on .toggle-thumb { left: 22px; background: #e8e8e8; }
-
+ 
   .save-btn {
     width: 100%;
     padding: 14px;
@@ -466,9 +466,9 @@
     font-family: inherit;
     transition: background 0.15s;
   }
-
+ 
   .save-btn:active { background: var(--bg3); }
-
+ 
   .toast {
     position: fixed;
     bottom: 40px;
@@ -486,9 +486,9 @@
     white-space: nowrap;
     z-index: 100;
   }
-
+ 
   .toast.show { opacity: 1; }
-
+ 
   #no-key-banner {
     margin: 12px 16px 0;
     padding: 10px 14px;
@@ -499,12 +499,12 @@
     color: #a07040;
     display: none;
   }
-
+ 
   #no-key-banner.visible { display: block; }
 </style>
 </head>
 <body>
-
+ 
 <!-- HOME SCREEN -->
 <div class="screen" id="home-screen">
   <div class="appbar">
@@ -515,13 +515,13 @@
       </svg>
     </button>
   </div>
-
+ 
   <div id="no-key-banner">
     No API key set. Go to Settings to add your Anthropic API key.
   </div>
-
+ 
   <div id="home-content"></div>
-
+ 
   <div class="bottom-bar">
     <button class="side-btn disabled" id="reset-btn" onclick="resetChat()" aria-label="Reset chat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
@@ -547,7 +547,7 @@
     </button>
   </div>
 </div>
-
+ 
 <!-- CHAT SCREEN (reuses home layout, content area swaps) -->
 <div class="screen hidden" id="chat-screen">
   <div class="appbar">
@@ -558,7 +558,7 @@
       </svg>
     </button>
   </div>
-
+ 
   <div id="chat-messages">
     <div id="listening-indicator">
       <div class="listen-dot"></div>
@@ -575,7 +575,7 @@
       <div class="wave-label">tutor speaking</div>
     </div>
   </div>
-
+ 
   <div class="bottom-bar">
     <button class="side-btn" id="reset-btn-chat" onclick="resetChat()" aria-label="Reset chat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
@@ -601,7 +601,7 @@
     </button>
   </div>
 </div>
-
+ 
 <!-- SETTINGS SCREEN -->
 <div class="screen hidden" id="settings-screen">
   <div class="appbar with-back">
@@ -613,9 +613,9 @@
     <span style="font-size:13px;color:var(--text2);font-weight:500;">settings</span>
     <div style="width:36px;"></div>
   </div>
-
+ 
   <div class="settings-body">
-
+ 
     <div>
       <div class="settings-section-label">API KEY</div>
       <div class="settings-row">
@@ -623,19 +623,31 @@
         <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false"/>
       </div>
     </div>
-
+ 
     <div>
-      <div class="settings-section-label">VOICES</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="settings-section-label" style="margin-bottom:0;">VOICES</div>
+        <button onclick="refreshVoices()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;">↻ refresh list</button>
+      </div>
       <div class="settings-row">
         <div class="settings-row-label">German voice</div>
         <select id="de-voice-select"></select>
+        <div style="margin-top:8px;border-top:0.5px solid var(--border);padding-top:8px;">
+          <div class="settings-row-label" style="margin-bottom:4px;">or type name manually</div>
+          <input type="text" id="de-voice-manual" placeholder="e.g. Petra" autocomplete="off" spellcheck="false"/>
+        </div>
       </div>
       <div class="settings-row">
         <div class="settings-row-label">English voice</div>
         <select id="en-voice-select"></select>
+        <div style="margin-top:8px;border-top:0.5px solid var(--border);padding-top:8px;">
+          <div class="settings-row-label" style="margin-bottom:4px;">or type name manually</div>
+          <input type="text" id="en-voice-manual" placeholder="e.g. Daniel" autocomplete="off" spellcheck="false"/>
+        </div>
       </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:-4px;margin-bottom:4px;line-height:1.5;">On iPhone, go to Settings → Accessibility → Spoken Content → Voices to see exact voice names.</div>
     </div>
-
+ 
     <div>
       <div class="settings-section-label">EXPORT</div>
       <div class="settings-toggle-row">
@@ -648,15 +660,15 @@
         </div>
       </div>
     </div>
-
+ 
     <button class="save-btn" onclick="saveSettings()">save settings</button>
-
+ 
   </div>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
-
+ 
+ 
 <script>
 // ─── STATE ───────────────────────────────────────────────────────────────────
 const state = {
@@ -671,7 +683,7 @@ const state = {
   recognition: null,
   allVoices: []
 };
-
+ 
 // ─── WORD OF THE DAY ─────────────────────────────────────────────────────────
 const words = [
   { word: 'Fernweh', pos: 'das Fernweh (n.)', meaning: 'a longing for distant places; wanderlust', example: '"Ich habe Fernweh nach den Bergen."' },
@@ -682,7 +694,7 @@ const words = [
   { word: 'Torschlusspanik', pos: 'die Torschlusspanik (n.)', meaning: 'the fear of diminishing opportunities as one ages', example: '"Mit 30 bekam sie Torschlusspanik."' },
   { word: 'Fingerspitzengefühl', pos: 'das Fingerspitzengefühl (n.)', meaning: 'the ability to handle delicate situations with tact', example: '"Das erfordert viel Fingerspitzengefühl."' }
 ];
-
+ 
 function renderWordOfDay() {
   const day = new Date().getDay();
   const w = words[day % words.length];
@@ -695,23 +707,23 @@ function renderWordOfDay() {
     <div class="wotd-example">${w.example}</div>
   `;
 }
-
+ 
 // ─── SCREEN NAVIGATION ───────────────────────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
-
+ 
 function openSettings() {
   populateVoiceSelects();
   document.getElementById('api-key-input').value = state.apiKey ? '••••••••' + state.apiKey.slice(-4) : '';
   showScreen('settings-screen');
 }
-
+ 
 function closeSettings() {
   showScreen(state.hasChat ? 'chat-screen' : 'home-screen');
 }
-
+ 
 // ─── SETTINGS ────────────────────────────────────────────────────────────────
 function loadSettings() {
   state.apiKey = localStorage.getItem('apiKey') || '';
@@ -722,55 +734,63 @@ function loadSettings() {
   if (!state.apiKey) document.getElementById('no-key-banner').classList.add('visible');
   return { savedDe, savedEn };
 }
-
+ 
 function saveSettings() {
   const keyInput = document.getElementById('api-key-input').value.trim();
   if (keyInput && !keyInput.startsWith('••')) {
     state.apiKey = keyInput;
     localStorage.setItem('apiKey', keyInput);
   }
-
+ 
   const deSelect = document.getElementById('de-voice-select');
   const enSelect = document.getElementById('en-voice-select');
-  const deName = deSelect.value;
-  const enName = enSelect.value;
+  const deManual = document.getElementById('de-voice-manual').value.trim();
+  const enManual = document.getElementById('en-voice-manual').value.trim();
+  const deName = deManual || deSelect.value;
+  const enName = enManual || enSelect.value;
   state.deVoice = state.allVoices.find(v => v.name === deName) || null;
   state.enVoice = state.allVoices.find(v => v.name === enName) || null;
   localStorage.setItem('deVoiceName', deName);
   localStorage.setItem('enVoiceName', enName);
   localStorage.setItem('autocopy', state.autocopy);
-
+ 
   document.getElementById('no-key-banner').classList.toggle('visible', !state.apiKey);
   showToast('Settings saved');
   setTimeout(() => closeSettings(), 800);
 }
-
+ 
 function toggleAutocopy() {
   state.autocopy = !state.autocopy;
   document.getElementById('autocopy-toggle').classList.toggle('on', state.autocopy);
 }
-
+ 
 // ─── VOICES ──────────────────────────────────────────────────────────────────
 function loadVoices() {
   state.allVoices = window.speechSynthesis.getVoices();
   const { savedDe, savedEn } = loadSettings();
-
+ 
   if (savedDe) state.deVoice = state.allVoices.find(v => v.name === savedDe) || null;
   if (savedEn) state.enVoice = state.allVoices.find(v => v.name === savedEn) || null;
-
+ 
   if (!state.deVoice) state.deVoice = state.allVoices.find(v => v.lang.startsWith('de')) || null;
   if (!state.enVoice) state.enVoice = state.allVoices.find(v => v.lang.startsWith('en')) || null;
 }
-
+ 
+function refreshVoices() {
+  state.allVoices = window.speechSynthesis.getVoices();
+  populateVoiceSelects();
+  showToast('Refreshed — ' + state.allVoices.length + ' voices found');
+}
+ 
 function populateVoiceSelects() {
   const deSelect = document.getElementById('de-voice-select');
   const enSelect = document.getElementById('en-voice-select');
   deSelect.innerHTML = '';
   enSelect.innerHTML = '';
-
+ 
   const deVoices = state.allVoices.filter(v => v.lang.startsWith('de'));
   const enVoices = state.allVoices.filter(v => v.lang.startsWith('en'));
-
+ 
   deVoices.forEach(v => {
     const opt = document.createElement('option');
     opt.value = v.name;
@@ -778,7 +798,7 @@ function populateVoiceSelects() {
     if (state.deVoice && v.name === state.deVoice.name) opt.selected = true;
     deSelect.appendChild(opt);
   });
-
+ 
   enVoices.forEach(v => {
     const opt = document.createElement('option');
     opt.value = v.name;
@@ -786,65 +806,65 @@ function populateVoiceSelects() {
     if (state.enVoice && v.name === state.enVoice.name) opt.selected = true;
     enSelect.appendChild(opt);
   });
-
+ 
   if (!deVoices.length) deSelect.innerHTML = '<option>No German voices found</option>';
   if (!enVoices.length) enSelect.innerHTML = '<option>No English voices found</option>';
 }
-
+ 
 // ─── SPEECH RECOGNITION ──────────────────────────────────────────────────────
 function setupRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { showToast('Speech recognition not supported in this browser'); return; }
-
+ 
   state.recognition = new SR();
   state.recognition.continuous = false;
   state.recognition.interimResults = false;
   state.recognition.lang = 'de-DE';
-
+ 
   state.recognition.onresult = (e) => {
     const transcript = e.results[0][0].transcript;
     stopListening();
     addBubble('user', transcript);
     sendToTutor(transcript);
   };
-
+ 
   state.recognition.onerror = (e) => {
     stopListening();
     if (e.error !== 'aborted') showToast('Could not hear you. Try again.');
   };
-
+ 
   state.recognition.onend = () => {
     if (state.isListening) stopListening();
   };
 }
-
+ 
 function toggleMic() {
   if (!state.apiKey) { showToast('Add your API key in Settings first'); openSettings(); return; }
   if (state.isSpeaking) { speechSynthesis.cancel(); setWave(false); state.isSpeaking = false; }
   if (state.isListening) { stopListening(); return; }
   startListening();
 }
-
+ 
 function startListening() {
   if (!state.recognition) setupRecognition();
   if (!state.recognition) return;
-
+ 
   if (!state.hasChat) switchToChat();
-
+ 
   state.isListening = true;
   setListening(true);
   state.recognition.lang = 'de-DE';
-
+ 
   try { state.recognition.start(); }
   catch(e) { stopListening(); }
 }
-
+ 
 function stopListening() {
   state.isListening = false;
   setListening(false);
   try { state.recognition && state.recognition.stop(); } catch(e) {}
 }
-
+ 
 // ─── CHAT UI ─────────────────────────────────────────────────────────────────
 function switchToChat() {
   state.hasChat = true;
@@ -852,60 +872,60 @@ function switchToChat() {
   document.getElementById('reset-btn').classList.remove('disabled');
   document.getElementById('download-btn').classList.remove('disabled');
 }
-
+ 
 function addBubble(role, text) {
   const messages = document.getElementById('chat-messages');
   const isUser = role === 'user';
-
+ 
   const wrapper = document.createElement('div');
   wrapper.style.display = 'flex';
   wrapper.style.flexDirection = 'column';
-
+ 
   const bubble = document.createElement('div');
   bubble.className = `bubble ${role}`;
-
+ 
   if (!isUser) {
     const parsed = parseResponse(text);
     bubble.innerHTML = parsed;
   } else {
     bubble.textContent = text;
   }
-
+ 
   const label = document.createElement('div');
   label.className = `bubble-label ${role}`;
   label.textContent = isUser ? 'you' : 'tutor';
-
+ 
   wrapper.appendChild(bubble);
   wrapper.appendChild(label);
-
+ 
   const wave = document.getElementById('wave-container');
   const listening = document.getElementById('listening-indicator');
   messages.insertBefore(wrapper, wave);
   messages.insertBefore(wrapper, listening);
-
+ 
   messages.scrollTop = messages.scrollHeight;
-
+ 
   state.chatHistory.push({ role: isUser ? 'user' : 'assistant', content: text });
 }
-
+ 
 function parseResponse(text) {
   return text.replace(/\[DE\](.*?)\[EN\]/gs, '<span class="de-text">$1</span>')
              .replace(/\[DE\](.*?)$/gs, '<span class="de-text">$1</span>');
 }
-
+ 
 function setListening(on) {
   document.getElementById('listening-indicator').classList.toggle('visible', on);
   document.getElementById('mic-btn').classList.toggle('listening', on);
   document.getElementById('mic-btn-chat').classList.toggle('listening', on);
 }
-
+ 
 function setWave(on) {
   document.getElementById('wave-container').classList.toggle('visible', on);
 }
-
+ 
 // ─── TUTOR API CALL ──────────────────────────────────────────────────────────
 const SYSTEM_PROMPT = `You are a friendly German language tutor. The user may speak German, English, or a mix of both.
-
+ 
 Rules:
 - If the user speaks German, assess their grammar silently. Only correct if they explicitly ask "is that correct?" or similar.
 - If asked to check grammar, respond concisely: say if it's correct or not, and briefly explain why.
@@ -914,14 +934,14 @@ Rules:
 - Keep all responses short and voice-friendly — 1 to 3 sentences maximum.
 - When including a German phrase in your response, wrap it like this: [DE]Kann ich hier sitzen?[EN] followed by the English explanation.
 - Be warm, encouraging and patient.`;
-
+ 
 async function sendToTutor(userText) {
   setWave(true);
   state.isSpeaking = true;
-
+ 
   const messages = state.chatHistory.slice(-10).map(m => ({ role: m.role, content: m.content }));
   messages[messages.length - 1] = { role: 'user', content: userText };
-
+ 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -938,12 +958,12 @@ async function sendToTutor(userText) {
         messages
       })
     });
-
+ 
     if (!res.ok) {
       const err = await res.json();
       throw new Error(err.error?.message || 'API error');
     }
-
+ 
     const data = await res.json();
     const reply = data.content[0].text;
     setWave(false);
@@ -956,14 +976,14 @@ async function sendToTutor(userText) {
     showToast(err.message.includes('401') ? 'Invalid API key' : 'Error: ' + err.message);
   }
 }
-
+ 
 // ─── TTS ─────────────────────────────────────────────────────────────────────
 function speak(text) {
   speechSynthesis.cancel();
   const segments = parseSegments(text);
   speakSegments(segments, 0);
 }
-
+ 
 function parseSegments(text) {
   const segs = [];
   const regex = /\[DE\](.*?)\[EN\]|([^\[]+)/gs;
@@ -975,29 +995,34 @@ function parseSegments(text) {
   if (!segs.length) segs.push({ text, lang: 'en' });
   return segs;
 }
-
+ 
 function speakSegments(segs, idx) {
   if (idx >= segs.length) { setWave(false); state.isSpeaking = false; return; }
   const seg = segs[idx];
   const utter = new SpeechSynthesisUtterance(seg.text);
-
+  const liveVoices = window.speechSynthesis.getVoices();
+ 
   if (seg.lang === 'de') {
     utter.lang = 'de-DE';
-    if (state.deVoice) utter.voice = state.deVoice;
+    const deName = localStorage.getItem('deVoiceName');
+    const v = liveVoices.find(v => v.name === deName) || state.deVoice;
+    if (v) utter.voice = v;
     utter.rate = 0.88;
   } else {
     utter.lang = 'en-US';
-    if (state.enVoice) utter.voice = state.enVoice;
+    const enName = localStorage.getItem('enVoiceName');
+    const v = liveVoices.find(v => v.name === enName) || state.enVoice;
+    if (v) utter.voice = v;
     utter.rate = 0.95;
   }
-
+ 
   setWave(true);
   state.isSpeaking = true;
   utter.onend = () => speakSegments(segs, idx + 1);
   utter.onerror = () => speakSegments(segs, idx + 1);
   speechSynthesis.speak(utter);
 }
-
+ 
 // ─── RESET & DOWNLOAD ────────────────────────────────────────────────────────
 function resetChat() {
   if (state.autocopy) copyTranscript();
@@ -1020,7 +1045,7 @@ function resetChat() {
   document.getElementById('download-btn').classList.add('disabled');
   showScreen('home-screen');
 }
-
+ 
 function downloadChat() {
   if (!state.chatHistory.length) return;
   const text = buildTranscript();
@@ -1033,11 +1058,11 @@ function downloadChat() {
   URL.revokeObjectURL(url);
   showToast('Chat downloaded');
 }
-
+ 
 function copyTranscript() {
   navigator.clipboard.writeText(buildTranscript()).catch(() => {});
 }
-
+ 
 function buildTranscript() {
   const lines = state.chatHistory.map(m => {
     const role = m.role === 'user' ? 'You' : 'Tutor';
@@ -1045,7 +1070,7 @@ function buildTranscript() {
   });
   return `German Tutor Session — ${new Date().toLocaleDateString()}\n\n` + lines.join('\n\n');
 }
-
+ 
 // ─── TOAST ───────────────────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1053,7 +1078,7 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
-
+ 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 loadVoices();
 if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -1061,7 +1086,8 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 }
 renderWordOfDay();
 setupRecognition();
-
+ 
 </script>
 </body>
 </html>
+ 

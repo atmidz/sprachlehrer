@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Sprachlehrer">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Sprachlehrer&quot;,&quot;short_name&quot;:&quot;Sprachlehrer&quot;,&quot;start_url&quot;:&quot;/&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#0f1117&quot;,&quot;theme_color&quot;:&quot;#0f1117&quot;}">
 <title>Sprachlehrer</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -56,7 +56,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 52px 20px 12px;
+    padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 20px 12px;
     border-bottom: 0.5px solid var(--border);
     flex-shrink: 0;
   }
@@ -275,7 +275,7 @@
  
   /* BOTTOM BAR */
   .bottom-bar {
-    padding: 12px 20px 36px;
+    padding: 12px 20px max(36px, calc(env(safe-area-inset-bottom) + 16px));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -817,19 +817,32 @@ function populateVoiceSelects() {
 // ─── SPEECH RECOGNITION ──────────────────────────────────────────────────────
 function setupRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { showToast('Speech recognition not supported in this browser'); return; }
+  if (!SR) { showToast('Speech recognition not supported. Use Chrome or Safari.'); return; }
  
   state.recognition = new SR();
   state.recognition.continuous = false;
   state.recognition.interimResults = false;
-  state.recognition.lang = 'de-DE';
   state.recognition.maxAlternatives = 1;
  
+  const isAndroid = /android/i.test(navigator.userAgent);
+ 
+  if (isAndroid) {
+    state.recognition.lang = 'de-DE';
+  } else {
+    state.recognition.lang = 'de-DE';
+  }
+ 
+  let silenceTimer = null;
+ 
   state.recognition.onspeechend = () => {
-    setTimeout(() => { try { state.recognition.stop(); } catch(e) {} }, 1200);
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(() => {
+      try { state.recognition.stop(); } catch(e) {}
+    }, isAndroid ? 500 : 1200);
   };
  
   state.recognition.onresult = (e) => {
+    clearTimeout(silenceTimer);
     const transcript = e.results[0][0].transcript;
     stopListening();
     addBubble('user', transcript);
@@ -837,19 +850,29 @@ function setupRecognition() {
   };
  
   state.recognition.onerror = (e) => {
+    clearTimeout(silenceTimer);
     stopListening();
-    if (e.error !== 'aborted') showToast('Could not hear you. Try again.');
+    if (e.error === 'network') showToast('Network error — check connection');
+    else if (e.error === 'not-allowed') showToast('Mic permission denied — check browser settings');
+    else if (e.error !== 'aborted' && e.error !== 'no-speech') showToast('Could not hear you. Try again.');
   };
  
   state.recognition.onend = () => {
+    clearTimeout(silenceTimer);
     if (state.isListening) stopListening();
   };
 }
  
 function unlockIOSAudio() {
-  if (window._iosAudioUnlocked) return;
-  try { getAudioContext(); } catch(e) {}
-  window._iosAudioUnlocked = true;
+  if (window._audioUnlocked) return;
+  window._audioUnlocked = true;
+  const a = new Audio();
+  a.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+  a.volume = 0.01;
+  a.play().catch(() => {});
+  if (state.audioContext && state.audioContext.state === 'suspended') {
+    state.audioContext.resume();
+  }
 }
  
 function toggleMic() {
@@ -1010,7 +1033,11 @@ function getAudioContext() {
  
 async function googleSpeak(text, lang) {
   const key = state.googleTtsKey;
-  if (!key) { await fallbackSpeak(text, lang); return; }
+  if (!key) {
+    showToast('Add Google TTS key in Settings for voice output');
+    await fallbackSpeak(text, lang);
+    return;
+  }
  
   const isDE = lang === 'de';
   const savedName = localStorage.getItem(isDE ? 'deVoiceName' : 'enVoiceName');
@@ -1031,30 +1058,21 @@ async function googleSpeak(text, lang) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    if (!res.ok) throw new Error('Google TTS error');
+    if (!res.ok) throw new Error('Google TTS ' + res.status);
     const data = await res.json();
-    const audio = base64ToArrayBuffer(data.audioContent);
-    const ctx = getAudioContext();
-    const decoded = await ctx.decodeAudioData(audio);
-    const source = ctx.createBufferSource();
-    source.buffer = decoded;
-    source.connect(ctx.destination);
-    return new Promise(resolve => {
-      source.onended = resolve;
-      source.start(0);
+ 
+    return new Promise((resolve, reject) => {
+      const audio = new Audio();
+      audio.src = 'data:audio/mp3;base64,' + data.audioContent;
+      audio.onended = resolve;
+      audio.onerror = () => { fallbackSpeak(text, lang).then(resolve); };
+      audio.play().catch(() => { fallbackSpeak(text, lang).then(resolve); });
     });
   } catch (e) {
-    fallbackSpeak(text, lang);
+    await fallbackSpeak(text, lang);
   }
 }
  
-function base64ToArrayBuffer(base64) {
-  const bin = atob(base64);
-  const buf = new ArrayBuffer(bin.length);
-  const view = new Uint8Array(buf);
-  for (let i = 0; i < bin.length; i++) view[i] = bin.charCodeAt(i);
-  return buf;
-}
  
 function fallbackSpeak(text, lang) {
   return new Promise(resolve => {

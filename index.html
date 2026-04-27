@@ -1033,11 +1033,7 @@ function getAudioContext() {
  
 async function googleSpeak(text, lang) {
   const key = state.googleTtsKey;
-  if (!key) {
-    showToast('Add Google TTS key in Settings for voice output');
-    await fallbackSpeak(text, lang);
-    return;
-  }
+  if (!key) { await fallbackSpeak(text, lang); return; }
  
   const isDE = lang === 'de';
   const savedName = localStorage.getItem(isDE ? 'deVoiceName' : 'enVoiceName');
@@ -1058,17 +1054,26 @@ async function googleSpeak(text, lang) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    if (!res.ok) throw new Error('Google TTS ' + res.status);
+    if (!res.ok) { throw new Error('Google TTS ' + res.status); }
     const data = await res.json();
  
-    return new Promise((resolve, reject) => {
-      const audio = new Audio();
-      audio.src = 'data:audio/mp3;base64,' + data.audioContent;
-      audio.onended = resolve;
-      audio.onerror = () => { fallbackSpeak(text, lang).then(resolve); };
-      audio.play().catch(() => { fallbackSpeak(text, lang).then(resolve); });
+    // Convert base64 → binary → Blob → Object URL
+    // Blob URLs work reliably on both iOS Safari and Android Chrome
+    const binary = atob(data.audioContent);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'audio/mpeg' });
+    const url = URL.createObjectURL(blob);
+ 
+    return new Promise((resolve) => {
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); resolve(); };
+      audio.onerror = () => { URL.revokeObjectURL(url); fallbackSpeak(text, lang).then(resolve); };
+      audio.play().catch(() => { URL.revokeObjectURL(url); fallbackSpeak(text, lang).then(resolve); });
     });
   } catch (e) {
+    console.error('Google TTS error:', e);
+    showToast('TTS error — check Google API key');
     await fallbackSpeak(text, lang);
   }
 }
